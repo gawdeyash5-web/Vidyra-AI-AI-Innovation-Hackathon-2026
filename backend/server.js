@@ -601,23 +601,26 @@ async function generateDidClip({ narration, concept, topic, clipId, customPresen
     ? `Basic ${Buffer.from(apiKey.trim()).toString("base64")}`
     : `Basic ${apiKey.trim()}`;
 
-  const presenterId = customPresenterId || process.env.DID_PRESENTER_ID || "amy-jcwCkr1grs";
+  let presenterId = (customPresenterId || process.env.DID_PRESENTER_ID || "v2_public_Alyssa_NoHands_BlackShirt_Home@Mvn6Nalx90").trim();
+  // Guard against stale V2 talk IDs like 'amy-jcwCkr1grs' which cause 400 "Invalid clip presenter id"
+  if (presenterId === "amy-jcwCkr1grs" || !presenterId.startsWith("v2_public_")) {
+    presenterId = "v2_public_Alyssa_NoHands_BlackShirt_Home@Mvn6Nalx90";
+  }
   const voiceId = customVoiceId || process.env.DID_VOICE_ID || "en-US-JennyNeural";
 
   const payload = {
+    presenter_id: presenterId,
     script: {
       type: "text",
-      subtitles: "false",
+      input: narration,
       provider: {
         type: "microsoft",
         voice_id: voiceId,
       },
-      input: narration,
     },
     config: {
       result_format: "mp4",
     },
-    presenter_id: presenterId,
   };
 
   console.log(`[D-ID] Initiating live clip creation for presenter: ${presenterId}`);
@@ -637,7 +640,8 @@ async function generateDidClip({ narration, concept, topic, clipId, customPresen
       let errBody = {};
       try { errBody = await createRes.json(); } catch (_) {}
 
-      console.error(`[D-ID] Creation failed with HTTP ${status}:`, errBody.description || errBody.message || "Unknown error");
+      console.error("D-ID status:", status);
+      console.error("D-ID response:", JSON.stringify(errBody, null, 2));
 
       let userMsg = `D-ID video generation failed (HTTP ${status})`;
       if (status === 401) userMsg = "D-ID authentication failed. Check DID_API_KEY.";
