@@ -19,7 +19,7 @@ import {
   ChevronLeft,
 } from "lucide-react";
 
-import { createLesson, evaluateAnswer, generateTeachingVideo, generateTeachingPart, resolveVideoUrl, apiBaseUrl } from "./lib/api";
+import { createLesson, evaluateAnswer, generateTeachingVideo, generateTeachingPart, resolveVideoUrl } from "./lib/api";
 import { BackendLesson, BackendEvaluation, Stage, VideoGenerationState, TeachingPart } from "./lib/models";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { TeachingStudioVideo } from "./components/TeachingStudioVideo";

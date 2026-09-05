@@ -7,9 +7,15 @@ import {
   GenerateTeachingPartResponse
 } from "./models";
 
-export const apiBaseUrl =
+export const API_BASE_URL =
   (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, "") ||
-  "http://localhost:5000";
+  (import.meta.env.DEV ? "http://localhost:5000" : "");
+
+if (!API_BASE_URL && import.meta.env.PROD) {
+  throw new Error("VITE_API_BASE_URL is missing in production.");
+}
+
+export const apiBaseUrl = API_BASE_URL;
 
 /**
  * Resolves a video URL returned by the backend.
@@ -28,11 +34,14 @@ export function resolveVideoUrl(url?: string | null): string | undefined {
     return trimmed;
   }
   const cleanPath = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
-  return `${apiBaseUrl}${cleanPath}`;
+  return `${API_BASE_URL}${cleanPath}`;
 }
 
 async function postJson<T>(endpoint: string, body: unknown): Promise<T> {
-  const url = `${apiBaseUrl}${endpoint}`;
+  if (!API_BASE_URL && import.meta.env.PROD) {
+    throw new Error("VITE_API_BASE_URL is missing in production.");
+  }
+  const url = `${API_BASE_URL}${endpoint}`;
   try {
     const response = await fetch(url, {
       method: "POST",
@@ -57,7 +66,7 @@ async function postJson<T>(endpoint: string, body: unknown): Promise<T> {
   } catch (err: unknown) {
     if (err instanceof Error) {
       if (err.message.includes("Failed to fetch") || err.message.includes("NetworkError")) {
-        throw new Error(`Unable to connect to backend server at ${apiBaseUrl}. Please ensure the server is running.`);
+        throw new Error(`Unable to connect to backend server at ${API_BASE_URL || "(empty URL)"}. Please ensure the server is running.`);
       }
       throw err;
     }
