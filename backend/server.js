@@ -51,17 +51,23 @@ try {
 app.use("/videos", express.static(videosDir));
 
 
+const geminiApiKey = (process.env.GEMINI_API_KEY || "").trim();
+
+console.log({
+  geminiKeyPresent: Boolean(geminiApiKey),
+  geminiKeyPrefix: geminiApiKey ? geminiApiKey.slice(0, 4) : null
+});
+
 const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
+  apiKey: geminiApiKey,
 });
 
 async function safeGenerateContent(prompt) {
   const models = [
-    "gemini-3.5-flash-lite",
-    "gemini-3.1-flash-lite-preview",
-    "gemini-flash-latest",
-    "gemini-3.5-flash",
-    "gemini-3.6-flash"
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-1.5-flash",
+    "gemini-2.0-flash-lite"
   ];
   let lastError = null;
   for (const model of models) {
