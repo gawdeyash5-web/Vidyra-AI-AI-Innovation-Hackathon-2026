@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Environment variables & secrets (NEVER COMMIT)
+.env
+.env.*
+!.env.example
+backend/.env
+backend/.env.*
+!backend/.env.example
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# Production builds
+dist/
+frontend/dist/
+build/
+
+# Local media and caches
+backend/videos/*.mp4
+backend/videos/cache.json
+*.mp4
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
